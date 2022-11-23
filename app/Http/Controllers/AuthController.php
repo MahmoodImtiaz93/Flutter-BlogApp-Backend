@@ -43,7 +43,7 @@ class AuthController extends Controller
         ]);
 
         //attempt login
-        if (Auth::attempt($fields)) {
+        if (!Auth::attempt($fields)) {
             return response([
                 'message' => 'Invalid Crenditials'
             ], 403);
