@@ -19,3 +19,11 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('/register',[AuthController::class,'register']);
 Route::post('/login',[AuthController::class,'login']);
+
+
+//procted Routes
+Route::group(['middleware'=>['auth:sanctum']],function(){
+    //user
+    Route::post('/logout',[AuthController::class,'logout']);
+    Route::get('/user',[AuthController::class,'user']);
+});
