@@ -12,10 +12,17 @@ class PostController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+
+     //Get All posts
     public function index()
     {
-        //
+        return response([
+            'posts'=>Post::orderBy('created_at','desc')->with('user:id,name,image')->withCount('coments','likes')->get()
+        ],200);
     }
+
+     
+
 
     /**
      * Show the form for creating a new resource.
