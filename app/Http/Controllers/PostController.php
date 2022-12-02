@@ -13,7 +13,7 @@ class PostController extends Controller
     public function index()
     {
         return response([
-            'posts' => Post::orderBy('created_at', 'desc')->with('user:id,name,image')->withCount('comments', 'likes')->get()
+            'posts' => Post::orderBy('created_at', 'desc')->with('user:id,name,image')->withCount('coments', 'likes' )->get()
         ], 200);
     }
 
