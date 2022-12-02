@@ -7,86 +7,97 @@ use Illuminate\Http\Request;
 
 class PostController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
 
-     //Get All posts
+
+    //Get All posts
     public function index()
     {
         return response([
-            'posts'=>Post::orderBy('created_at','desc')->with('user:id,name,image')->withCount('coments','likes')->get()
-        ],200);
+            'posts' => Post::orderBy('created_at', 'desc')->with('user:id,name,image')->withCount('coments', 'likes')->get()
+        ], 200);
     }
 
-     
-
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
+    // create a post
     public function store(Request $request)
     {
-        //
+        //validate fields
+        $fields = $request->validate([
+            'body' => 'required|string'
+        ]);
+        $post = Post::create([
+            'body' => $fields['body'],
+            'user_id' => auth()->user()->id
+        ]);
+
+        return response([
+            'message' => 'Post Created',
+            'post' => $post
+        ], 200);
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Post  $post
-     * @return \Illuminate\Http\Response
-     */
+    //get a single post
     public function show(Post $post)
     {
-        //
+        return response([
+            'post' => Post::where('id', $id)->withCount('coments', 'likes')->get()
+        ], 200);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Post  $post
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Post $post)
-    {
-        //
-    }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Post  $post
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, Post $post)
+    //update a post
+    public function update(Request $request, $id)
     {
-        //
-    }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Post  $post
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Post $post)
+        $post = Post::find($id);
+
+        if (!$post) {
+            return response([
+                'message' => 'Post not found'
+            ], 403);
+        }
+        if ($post->user_id != auth()->user()->id) {
+            return response([
+                'message' => 'Permission denied'
+            ], 403);
+        }
+
+        //validate fields
+        $fields = $request->validate([
+            'body' => 'required|string'
+        ]);
+
+        $post->update([
+            'body' => $fields['body']
+        ]);
+
+        return response([
+            'message' => 'Post Updated',
+            'post' => $post
+        ], 200);
+    }
+    
+    //delete a post
+    public function destroy($id)
     {
-        //
+        $post = Post::find($id);
+
+        if (!$post) {
+            return response([
+                'message' => 'Post not found'
+            ], 403);
+        }
+        if ($post->user_id != auth()->user()->id) {
+            return response([
+                'message' => 'Permission denied'
+            ], 403);
+        }
+
+        $post->comments()->delete();
+        $post->likes()->delete();
+        $post->delete();
+
+        return response([
+            'message' => 'Post deleted'
+        ], 200);
     }
 }
