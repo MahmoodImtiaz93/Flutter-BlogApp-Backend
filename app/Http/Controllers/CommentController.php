@@ -8,21 +8,20 @@ use Illuminate\Http\Request;
 
 class CommentController extends Controller
 {
-    
+
     // get all comments of a post
     public function index($id)
     {
         $post = Post::find($id);
 
-        if(!$post)
-        {
+        if (!$post) {
             return response([
                 'message' => 'Post not found.'
             ], 403);
         }
 
         return response([
-            'comments' => $post->comments()->with('user:id,name,image')->get()
+            'comments' => $post->comments()->with('user:id,name')->get()
         ], 200);
     }
 
@@ -31,8 +30,7 @@ class CommentController extends Controller
     {
         $post = Post::find($id);
 
-        if(!$post)
-        {
+        if (!$post) {
             return response([
                 'message' => 'Post not found.'
             ], 403);
@@ -59,15 +57,13 @@ class CommentController extends Controller
     {
         $comment = Comment::find($id);
 
-        if(!$comment)
-        {
+        if (!$comment) {
             return response([
                 'message' => 'Comment not found.'
             ], 403);
         }
 
-        if($comment->user_id != auth()->user()->id)
-        {
+        if ($comment->user_id != auth()->user()->id) {
             return response([
                 'message' => 'Permission denied.'
             ], 403);
@@ -92,15 +88,13 @@ class CommentController extends Controller
     {
         $comment = Comment::find($id);
 
-        if(!$comment)
-        {
+        if (!$comment) {
             return response([
                 'message' => 'Comment not found.'
             ], 403);
         }
 
-        if($comment->user_id != auth()->user()->id)
-        {
+        if ($comment->user_id != auth()->user()->id) {
             return response([
                 'message' => 'Permission denied.'
             ], 403);
